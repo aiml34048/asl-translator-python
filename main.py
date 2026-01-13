@@ -28,7 +28,7 @@ class ASLTranslatorApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.is_recognizing = False
-        self.gemini_api_key = "YOUR_GEMINI_API_KEY_HERE"  # Replace with your API key
+        self.gemini_api_key = "AIzaSyDGAwaWup1nTkbS-FPMCGgm8qKOlMLDaBs"  # Your API key
         self.recognition_history = []
         self.tts_engine = pyttsx3.init()
         self.tts_engine.setProperty('rate', 150)
@@ -58,12 +58,12 @@ class ASLTranslatorApp(App):
         header.add_widget(title)
         header.add_widget(subtitle)
         
-        # Camera
+        # Camera - Changed index to 0 for default camera
         self.camera = Camera(
             resolution=(640, 480),
             size_hint_y=0.35,
             play=True,
-            index=1  # Front camera (0 for back camera)
+            index=0  # Changed from 1 to 0 - use default camera
         )
         
         # Result display
