@@ -58,12 +58,12 @@ class ASLTranslatorApp(App):
         header.add_widget(title)
         header.add_widget(subtitle)
         
-        # Camera - Changed index to 0 for default camera
+        # Camera
         self.camera = Camera(
             resolution=(640, 480),
             size_hint_y=0.35,
             play=True,
-            index=0  # Changed from 1 to 0 - use default camera
+            index=0  # Use default camera
         )
         
         # Result display
@@ -166,23 +166,27 @@ class ASLTranslatorApp(App):
         if not self.camera.texture:
             return
         
-        # Run in separate thread to avoid blocking UI
-        thread = threading.Thread(target=self._process_frame)
-        thread.daemon = True
-        thread.start()
-    
-    def _process_frame(self):
         try:
-            # Get camera texture
+            # Get camera texture IN MAIN THREAD
             texture = self.camera.texture
             if not texture:
                 return
             
-            # Convert texture to PIL Image
+            # Get texture data IN MAIN THREAD
             size = texture.size
             pixels = texture.pixels
             
-            # Create PIL Image from texture data
+            # Now process in separate thread with the captured data
+            thread = threading.Thread(target=self._process_frame, args=(size, pixels))
+            thread.daemon = True
+            thread.start()
+            
+        except Exception as e:
+            print(f"Capture error: {e}")
+    
+    def _process_frame(self, size, pixels):
+        try:
+            # Create PIL Image from texture data (now safe in thread)
             img = Image.frombytes('RGBA', size, pixels)
             img = img.transpose(Image.FLIP_TOP_BOTTOM)  # Flip vertically
             img = img.convert('RGB')
